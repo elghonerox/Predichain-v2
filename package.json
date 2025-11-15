@@ -1,0 +1,29 @@
+{
+  "name": "predichain",
+  "version": "1.0.0",
+  "description": "Fast-Resolution Prediction Markets with Gasless UX on BNB Chain",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network bscTestnet",
+    "deploy:mainnet": "hardhat run scripts/deploy.js --network bscMainnet"
+  },
+  "keywords": [
+    "prediction-markets",
+    "bnb-chain",
+    "blockchain",
+    "defi"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "hardhat": "^2.19.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1"
+  }
+}
+
