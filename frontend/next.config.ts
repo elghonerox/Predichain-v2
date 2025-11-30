@@ -13,6 +13,12 @@ const nextConfig = {
 
         return config
     },
+    // Explicitly provide empty turbopack config to avoid conflict
+    experimental: {
+        turbo: {
+            rules: {}
+        }
+    }
 }
 
 export default nextConfig
