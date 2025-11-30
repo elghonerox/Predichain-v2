@@ -25,7 +25,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0d14]">
+    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       {/* Subtle background gradient */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#6366f1] rounded-full mix-blend-multiply filter blur-[128px] opacity-10"></div>
@@ -34,16 +34,16 @@ export default function Home() {
 
       <div className="relative z-10">
         {/* Navigation */}
-        <nav className="border-b border-[rgba(255,255,255,0.08)] backdrop-blur-xl bg-[#0f1318]/50">
+        <nav className="border-b backdrop-blur-xl" style={{ borderColor: 'var(--border-default)', background: 'var(--bg-secondary)' }}>
           <div className="container mx-auto px-4 py-4">
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-gradient-to-br from-[#6366f1] to-[#06b6d4] rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.3)]">
-                  <span className="text-white font-bold text-xl">⚡</span>
+                  <span className="font-bold text-xl" style={{ color: 'var(--text-primary)' }}>⚡</span>
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-white">PrediChain</h1>
-                  <p className="text-xs text-[#64748b]">BNB Chain</p>
+                  <h1 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>PrediChain</h1>
+                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>BNB Chain</p>
                 </div>
               </div>
 
@@ -61,9 +61,9 @@ export default function Home() {
                     Connect Wallet
                   </Button>
                 ) : (
-                  <div className="px-4 py-2 bg-[#1a1f29] rounded-lg border border-[rgba(255,255,255,0.08)]">
-                    <p className="text-xs text-[#64748b]">Connected</p>
-                    <p className="text-sm text-white font-mono">{address?.slice(0, 6)}...{address?.slice(-4)}</p>
+                  <div className="px-4 py-2 rounded-lg border" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
+                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Connected</p>
+                    <p className="text-sm font-mono" style={{ color: 'var(--text-primary)' }}>{address?.slice(0, 6)}...{address?.slice(-4)}</p>
                   </div>
                 )}
               </div>
@@ -79,30 +79,30 @@ export default function Home() {
                 🏆 Seedify Prediction Markets Hackathon
               </span>
             </div>
-            <h2 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+            <h2 className="text-5xl md:text-7xl font-bold mb-6 leading-tight" style={{ color: 'var(--text-primary)' }}>
               Trade the Future
               <br />
               <span className="bg-gradient-to-r from-[#6366f1] via-[#06b6d4] to-[#10b981] text-transparent bg-clip-text">
                 With Confidence
               </span>
             </h2>
-            <p className="text-xl text-[#cbd5e1] mb-10 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl mb-10 max-w-2xl mx-auto leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
               Fast-resolution prediction markets powered by TWAP oracles. Trade on crypto prices with <span className="font-semibold text-[#06b6d4]">institutional-grade</span> security.
             </p>
 
             {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
-              <div className="bg-[#1a1f29] border border-[rgba(255,255,255,0.08)] rounded-2xl p-6 hover:border-[rgba(99,102,241,0.3)] transition-all duration-200">
+              <div className="rounded-2xl p-6 border hover:border-[rgba(99,102,241,0.3)] transition-all duration-200" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
                 <div className="text-4xl font-bold bg-gradient-to-r from-[#6366f1] to-[#818cf8] text-transparent bg-clip-text mb-2">⚡ Fast</div>
-                <p className="text-[#cbd5e1]">Hours to Resolution</p>
+                <p style={{ color: 'var(--text-secondary)' }}>Hours to Resolution</p>
               </div>
-              <div className="bg-[#1a1f29] border border-[rgba(255,255,255,0.08)] rounded-2xl p-6 hover:border-[rgba(6,182,212,0.3)] transition-all duration-200">
+              <div className="rounded-2xl p-6 border hover:border-[rgba(6,182,212,0.3)] transition-all duration-200" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
                 <div className="text-4xl font-bold bg-gradient-to-r from-[#06b6d4] to-[#10b981] text-transparent bg-clip-text mb-2">🔒 Secure</div>
-                <p className="text-[#cbd5e1]">TWAP Oracle Protection</p>
+                <p style={{ color: 'var(--text-secondary)' }}>TWAP Oracle Protection</p>
               </div>
-              <div className="bg-[#1a1f29] border border-[rgba(255,255,255,0.08)] rounded-2xl p-6 hover:border-[rgba(16,185,129,0.3)] transition-all duration-200">
+              <div className="rounded-2xl p-6 border hover:border-[rgba(16,185,129,0.3)] transition-all duration-200" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
                 <div className="text-4xl font-bold bg-gradient-to-r from-[#10b981] to-[#6366f1] text-transparent bg-clip-text mb-2">💎 2%</div>
-                <p className="text-[#cbd5e1]">Trading Fees</p>
+                <p style={{ color: 'var(--text-secondary)' }}>Trading Fees</p>
               </div>
             </div>
 
@@ -122,15 +122,15 @@ export default function Home() {
           {isConnected && (
             <div>
               <div className="flex justify-between items-center mb-8">
-                <h3 className="text-3xl font-bold text-white">Active Markets</h3>
+                <h3 className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Active Markets</h3>
                 <div className="flex gap-2">
-                  <button className="px-4 py-2 bg-[#1a1f29] rounded-lg text-white border border-[rgba(255,255,255,0.08)] hover:border-[rgba(99,102,241,0.3)] transition-all">
+                  <button className="px-4 py-2 rounded-lg border transition-all hover:border-[rgba(99,102,241,0.3)]" style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', borderColor: 'var(--border-default)' }}>
                     All
                   </button>
-                  <button className="px-4 py-2 bg-[rgba(255,255,255,0.02)] rounded-lg text-[#64748b] hover:text-white hover:bg-[rgba(255,255,255,0.04)] transition-all">
+                  <button className="px-4 py-2 rounded-lg transition-all" style={{ background: 'var(--border-subtle)', color: 'var(--text-muted)' }}>
                     Active
                   </button>
-                  <button className="px-4 py-2 bg-[rgba(255,255,255,0.02)] rounded-lg text-[#64748b] hover:text-white hover:bg-[rgba(255,255,255,0.04)] transition-all">
+                  <button className="px-4 py-2 rounded-lg transition-all" style={{ background: 'var(--border-subtle)', color: 'var(--text-muted)' }}>
                     Resolved
                   </button>
                 </div>
@@ -210,22 +210,22 @@ export default function Home() {
           {/* Features Section - Only show when not connected */}
           {!isConnected && (
             <div className="mt-24">
-              <h3 className="text-3xl font-bold text-white text-center mb-12">Why PrediChain?</h3>
+              <h3 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--text-primary)' }}>Why PrediChain?</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="bg-[#1a1f29] border border-[rgba(255,255,255,0.08)] rounded-2xl p-8 hover:border-[rgba(99,102,241,0.3)] transition-all duration-200">
+                <div className="rounded-2xl p-8 border hover:border-[rgba(99,102,241,0.3)] transition-all duration-200" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
                   <div className="text-4xl mb-4">💡</div>
-                  <h4 className="text-xl font-bold text-white mb-3">Transaction Simulation</h4>
-                  <p className="text-[#cbd5e1] leading-relaxed">See exactly what will happen before you trade. No surprises, no failed transactions.</p>
+                  <h4 className="text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>Transaction Simulation</h4>
+                  <p className="leading-relaxed" style={{ color: 'var(--text-secondary)' }}>See exactly what will happen before you trade. No surprises, no failed transactions.</p>
                 </div>
-                <div className="bg-[#1a1f29] border border-[rgba(255,255,255,0.08)] rounded-2xl p-8 hover:border-[rgba(6,182,212,0.3)] transition-all duration-200">
+                <div className="rounded-2xl p-8 border hover:border-[rgba(6,182,212,0.3)] transition-all duration-200" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
                   <div className="text-4xl mb-4">🛡️</div>
-                  <h4 className="text-xl font-bold text-white mb-3">TWAP Protection</h4>
-                  <p className="text-[#cbd5e1] leading-relaxed">Time-weighted average pricing prevents flash loan attacks and manipulation.</p>
+                  <h4 className="text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>TWAP Protection</h4>
+                  <p className="leading-relaxed" style={{ color: 'var(--text-secondary)' }}>Time-weighted average pricing prevents flash loan attacks and manipulation.</p>
                 </div>
-                <div className="bg-[#1a1f29] border border-[rgba(255,255,255,0.08)] rounded-2xl p-8 hover:border-[rgba(16,185,129,0.3)] transition-all duration-200">
+                <div className="rounded-2xl p-8 border hover:border-[rgba(16,185,129,0.3)] transition-all duration-200" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
                   <div className="text-4xl mb-4">⚡</div>
-                  <h4 className="text-xl font-bold text-white mb-3">Instant Clarity</h4>
-                  <p className="text-[#cbd5e1] leading-relaxed">Markets resolve in hours, not days. Get your winnings faster than ever.</p>
+                  <h4 className="text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>Instant Clarity</h4>
+                  <p className="leading-relaxed" style={{ color: 'var(--text-secondary)' }}>Markets resolve in hours, not days. Get your winnings faster than ever.</p>
                 </div>
               </div>
             </div>
@@ -233,9 +233,9 @@ export default function Home() {
         </div>
 
         {/* Footer */}
-        <footer className="border-t border-[rgba(255,255,255,0.08)] mt-24">
+        <footer className="border-t mt-24" style={{ borderColor: 'var(--border-default)' }}>
           <div className="container mx-auto px-4 py-8">
-            <div className="text-center text-[#64748b] text-sm">
+            <div className="text-center text-sm" style={{ color: 'var(--text-muted)' }}>
               <p>© 2025 PrediChain. Built for Seedify Hackathon on BNB Chain.</p>
             </div>
           </div>
