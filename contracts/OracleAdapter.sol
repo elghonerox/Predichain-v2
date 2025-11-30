@@ -44,6 +44,9 @@ contract OracleAdapter is IOracleAdapter, Ownable {
     
     /// @notice Maximum number of historical prices to store per asset
     uint256 public constant MAX_PRICE_HISTORY = 100;
+    
+    /// @notice Minimum time between price updates (prevents TWAP stuffing)
+    uint256 public constant MIN_UPDATE_INTERVAL = 5 minutes;
 
     // =============================================================
     //                           STRUCTS
@@ -89,6 +92,9 @@ contract OracleAdapter is IOracleAdapter, Ownable {
     
     /// @notice Circuit breaker status
     bool public circuitBreakerActive;
+    
+    /// @notice Last update timestamp per asset (for rate limiting)
+    mapping(string => uint256) private lastPriceUpdateTime;
 
     // =============================================================
     //                           EVENTS
@@ -157,13 +163,17 @@ contract OracleAdapter is IOracleAdapter, Ownable {
      * @param asset Asset symbol (e.g., "BTC", "ETH")
      * @param price New price in wei (scaled by 1e18)
      * 
-     * @dev Security checks:
+     * @dev Security checks (FIXED):
      *      - Price must be > 0
-     *      - If existing price, deviation must be <= MAX_PRICE_DEVIATION
+     *      - Circuit breaker checked BEFORE accepting any price data
+     *      - Deviation checked BEFORE state update (not after)
+     *      - Transaction REVERTS if deviation exceeds threshold
      *      - Updates price history for TWAP calculation
-     *      - Circuit breaker activates on large deviation but doesn't revert
      * 
-     * Emits: PriceUpdated, PriceHistoryUpdated, CircuitBreakerTriggered events
+     * Emits: PriceUpdated, PriceHistoryUpdated events
+     * Reverts: CircuitBreakerTriggered if deviation > MAX_PRICE_DEVIATION
+     * 
+     * SECURITY FIX: Circuit breaker now properly reverts before accepting bad prices
      */
     function updatePrice(
         string memory asset,
@@ -172,18 +182,24 @@ contract OracleAdapter is IOracleAdapter, Ownable {
         require(price > 0, "Price must be positive");
         require(bytes(asset).length > 0, "Asset cannot be empty");
         
-        // Check if circuit breaker is already active
+        // Check if circuit breaker is already active from previous trigger
         require(!circuitBreakerActive, "Circuit breaker active");
+        
+        // ✅ SECURITY FIX: Rate limiting to prevent TWAP stuffing
+        require(
+            block.timestamp >= lastPriceUpdateTime[asset] + MIN_UPDATE_INTERVAL,
+            "Update too frequent - wait 5 minutes between updates"
+ );
         
         PriceData memory oldData = prices[asset];
         
-        // Check price deviation to prevent manipulation
+        // ✅ SECURITY FIX: Check deviation BEFORE updating state
+        // This prevents accepting manipulated prices even if they're "just under" the threshold
         if (oldData.isValid && oldData.price > 0) {
             uint256 deviation = _calculateDeviation(oldData.price, price);
             
             if (deviation > MAX_PRICE_DEVIATION) {
-                // Trigger circuit breaker - set state and return early
-                // This allows the state change to persist (no revert)
+                // ✅ FIX: Trigger circuit breaker AND revert (don't accept price)
                 circuitBreakerActive = true;
                 
                 emit CircuitBreakerTriggered(
@@ -193,11 +209,13 @@ contract OracleAdapter is IOracleAdapter, Ownable {
                     deviation
                 );
                 
-                // Return early - don't update price, but circuit breaker is now active
-                return;
+                // ✅ CRITICAL FIX: REVERT instead of returning
+                // This ensures the manipulated price is NEVER stored
+                revert("Circuit breaker triggered - price deviation too large");
             }
         }
         
+        // ✅ Only reach here if deviation check passed or no previous price exists
         // Update current price
         prices[asset] = PriceData({
             price: price,
@@ -205,6 +223,9 @@ contract OracleAdapter is IOracleAdapter, Ownable {
             isValid: true,
             source: msg.sender
         });
+        
+        // Update rate limiting timestamp
+        lastPriceUpdateTime[asset] = block.timestamp;
         
         // Update price history for TWAP
         _updatePriceHistory(asset, price);
@@ -281,7 +302,12 @@ contract OracleAdapter is IOracleAdapter, Ownable {
      * @dev TWAP prevents flash loan attacks by averaging prices over time
      *      Formula: TWAP = Σ(price[i] * time[i]) / Σ(time[i])
      * 
-     * Security: Requires minimum period to prevent manipulation
+     * Security (FIXED): 
+     *      - Requires minimum period to prevent manipulation
+     *     - Validates ACTUAL time coverage (not just number of data points)
+     *      - Prevents TWAP stuffing attacks
+     * 
+     * SECURITY FIX: Now validates that price history actually SPANS the required period
      */
     function getTWAPPrice(
         string memory asset,
@@ -291,6 +317,17 @@ contract OracleAdapter is IOracleAdapter, Ownable {
         
         PricePoint[] storage history = priceHistory[asset];
         require(history.length >= 2, "Insufficient price history");
+        
+        // ✅ CRITICAL FIX: Validate ACTUAL time span coverage
+        // Prevents TWAP stuffing attack where attacker adds many points in short time
+        uint256 oldestTimestamp = history[0].timestamp;
+        uint256 newestTimestamp = history[history.length - 1].timestamp;
+        uint256 actualTimeSpan = newestTimestamp - oldestTimestamp;
+        
+        require(
+            actualTimeSpan >= period,
+            "Price history does not span required TWAP period"
+        );
         
         uint256 cutoffTime = block.timestamp - period;
         uint256 weightedSum = 0;

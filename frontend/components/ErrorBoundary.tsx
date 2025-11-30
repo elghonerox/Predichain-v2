@@ -24,12 +24,15 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('Error caught by boundary:', error, errorInfo)
-    
-    // Send to error tracking service (Sentry, etc.)
-    if (typeof window !== 'undefined' && (window as any).Sentry) {
-      (window as any).Sentry.captureException(error, {
-        contexts: { react: { componentStack: errorInfo.componentStack } }
-      })
+
+    // Send to error tracking service (Sentry, etc.) - type-safe approach
+    if (typeof window !== 'undefined') {
+      const win = window as { Sentry?: { captureException?: (error: Error, options?: unknown) => void } }
+      if (win.Sentry?.captureException) {
+        win.Sentry.captureException(error, {
+          contexts: { react: { componentStack: errorInfo.componentStack } }
+        })
+      }
     }
   }
 

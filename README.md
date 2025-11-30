@@ -1,16 +1,14 @@
 # PrediChain - Decentralized Prediction Markets on BNB Chain
 
 [![Tests](https://github.com/yourusername/predichain/actions/workflows/test.yml/badge.svg)](https://github.com/yourusername/predichain/actions/workflows/test.yml)
-[![Coverage](https://codecov.io/gh/yourusername/predichain/branch/main/graph/badge.svg)](https://codecov.io/gh/yourusername/predichain)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**PrediChain** is a decentralized prediction market platform built on BNB Chain, enabling users to create and trade on crypto price predictions with institutional-grade security and gasless UX.
+**PrediChain** is a decentralized prediction market platform built on BNB Chain, enabling users to create and trade on crypto price predictions with production-grade security.
 
 ## 🌟 Key Features
 
-- **⚡ Fast Resolution**: Markets resolve in minutes using TWAP oracle (vs. 24-48 hours for competitors)
-- **💨 Gasless Trading**: Account abstraction powered by Plena Finance
-- **🔒 Flash Loan Protection**: TWAP oracle with 1-hour minimum period
+- **⚡ Fast Resolution**: Markets resolve in hours using TWAP oracle (vs. 24-48 hours for competitors)
+- **🔒 Flash Loan Protection**: TWAP oracle with 1-hour minimum period and time-span validation
 - **🛡️ Circuit Breaker**: Automatic protection against price manipulation (>50% deviation)
 - **⏱️ Timelock Security**: 2-day delay for protocol fee withdrawals
 - **📊 2% Trading Fees**: Sustainable revenue model with transparent fee distribution
@@ -67,28 +65,32 @@ npx hardhat test
 npx hardhat run scripts/deploy.js --network bscTestnet
 ```
 
-## 📊 Test Coverage
+## 📊 Testing
 
 ```bash
-# Run tests with coverage
-npx hardhat coverage
+# Run tests
+npx hardhat test
 
 # Run gas reporter
 REPORT_GAS=true npx hardhat test
 ```
 
-**Current Coverage**: 90%+ across all contracts
-
 ## 🔐 Security
 
-- **Audit Status**: Pending (preparing for Hacken/CertiK)
+- **Audit Status**: In Progress (Preparing for professional audit)
 - **Security Features**:
-  - ✅ TWAP oracle (flash loan protection)
-  - ✅ Circuit breaker (price manipulation protection)
+  - ✅ TWAP oracle with time-span validation (flash loan protection)
+  - ✅ Circuit breaker with revert logic (price manipulation protection)
+  - ✅ Oracle rate limiting (5-min minimum between updates)
   - ✅ Emergency pause mechanism
   - ✅ Timelock withdrawals (rug pull protection)
   - ✅ Reentrancy guards on all state-changing functions
   - ✅ Comprehensive input validation
+
+- **Known Limitations**:
+  - ⚠️ Oracle updates are manual (automated feeds planned for Q2 2026)
+  - ⚠️ No formal security audit yet (scheduled for Q1 2026)
+  - ⚠️ Gasless UX not implemented (roadmap item)
 
 See [SECURITY.md](./SECURITY.md) for details.
 
