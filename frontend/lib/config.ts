@@ -351,44 +351,4 @@ export function validateConfiguration(): boolean {
   }
 }
 
-// ============================================================================
-// UPDATE CONTRACTS.TS TO USE NEW CONFIG
-// ============================================================================
 
-// frontend/lib/contracts.ts
-import { getContractAddress } from './config'
-
-export const PREDICTION_MARKET_ABI = [
-  // ... existing ABI
-] as const
-
-// Use centralized config instead of direct env access
-export const PREDICTION_MARKET_ADDRESS = getContractAddress('predictionMarket')
-export const ORACLE_ADAPTER_ADDRESS = getContractAddress('oracleAdapter')
-export const TREASURY_ADDRESS = getContractAddress('treasury')
-
-// ============================================================================
-// UPDATE WAGMI.TS TO USE NEW CONFIG
-// ============================================================================
-
-// frontend/lib/wagmi.ts
-import { defaultWagmiConfig } from '@web3modal/wagmi'
-import { bsc, bscTestnet } from 'wagmi/chains'
-import { getConfig } from './config'
-
-const config = getConfig()
-
-export const projectId = config.walletConnect.projectId
-
-const metadata = {
-  name: 'PrediChain',
-  description: 'Fast-Resolution Prediction Markets with Gasless UX on BNB Chain',
-  url: 'https://predichain.xyz',
-  icons: ['https://predichain.xyz/logo.png']
-}
-
-export const wagmiConfig = defaultWagmiConfig({
-  chains: [bscTestnet, bsc],
-  projectId,
-  metadata,
-})
