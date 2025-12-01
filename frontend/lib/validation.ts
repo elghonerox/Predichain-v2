@@ -3,6 +3,9 @@
 import { parseEther } from 'viem'
 import { CreateMarketFormData, ValidationError, FormValidation } from './types'
 
+// SECURITY FIX L-2: DOMPurify integration for XSS prevention
+import DOMPurify from 'isomorphic-dompurify'
+
 // ============================================================================
 // VALIDATION FUNCTIONS
 // ============================================================================
@@ -148,12 +151,43 @@ export function validateCreateMarketForm(data: CreateMarketFormData): FormValida
 // SANITIZATION FUNCTIONS
 // ============================================================================
 
+/**
+ * SECURITY FIX L-2: Sanitize HTML content to prevent XSS attacks
+ * Uses DOMPurify - industry standard sanitization library
+ * 
+ * @param dirty - Potentially unsafe HTML string
+ * @returns Sanitized HTML safe for rendering
+ */
+export function sanitizeHTML(dirty: string): string {
+  if (typeof window === 'undefined') {
+    // Server-side: strip all HTML
+    return dirty.replace(/<[^>]*>/g, '')
+  }
+
+  return DOMPurify.sanitize(dirty, {
+    ALLOWED_TAGS: [], // No HTML tags allowed in our app
+    ALLOWED_ATTR: [],
+    KEEP_CONTENT: true, // Keep text content
+  })
+}
+
+/**
+ * SECURITY FIX L-2: Sanitize string input - removes dangerous characters and patterns
+ * 
+ * @param input - Raw user input
+ * @returns Sanitized string safe for display and storage
+ */
 export function sanitizeString(input: string): string {
-  return input
+  // First pass: DOMPurify sanitization
+  const purified = sanitizeHTML(input)
+
+  // Second pass: Additional pattern-based sanitization
+  return purified
     .trim()
-    .replace(/[<>]/g, '') // Remove < and >
     .replace(/javascript:/gi, '') // Remove javascript: protocol
     .replace(/on\w+=/gi, '') // Remove event handlers
+    .replace(/data:/gi, '') // Remove data: protocol
+    .replace(/vbscript:/gi, '') // Remove vbscript: protocol
 }
 
 export function sanitizeNumber(input: string): string {
@@ -221,14 +255,14 @@ class RateLimiter {
   check(key: string, maxAttempts: number, windowMs: number): boolean {
     const now = Date.now()
     const attempts = this.attempts.get(key) || []
-    
+
     // Remove old attempts outside the window
     const validAttempts = attempts.filter(time => now - time < windowMs)
-    
+
     if (validAttempts.length >= maxAttempts) {
       return false
     }
-    
+
     validAttempts.push(now)
     this.attempts.set(key, validAttempts)
     return true
