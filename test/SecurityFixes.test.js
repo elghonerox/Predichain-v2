@@ -130,6 +130,9 @@ describe("Security Fixes Verification", function () {
             // Wait for delay period
             await time.increase(PUBLIC_RESOLUTION_DELAY + 1);
 
+            // Update oracle price to ensure we have fresh data for TWAP
+            await oracleAdapter.connect(feeder).updatePrice("BTC", ethers.parseEther("95000"));
+
             await expect(
                 predictionMarket.connect(user2).resolveMarket(1)
             ).to.not.be.reverted;

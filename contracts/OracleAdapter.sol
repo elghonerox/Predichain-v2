@@ -187,16 +187,12 @@ contract OracleAdapter is IOracleAdapter, Ownable {
         // Check if circuit breaker is already active from previous trigger
         require(!circuitBreakerActive, "Circuit breaker active");
         
-        // ✅ SECURITY FIX: Rate limiting to prevent TWAP stuffing
-        require(
-            block.timestamp >= lastPriceUpdateTime[asset] + MIN_UPDATE_INTERVAL,
-            "Update too frequent - wait 5 minutes between updates"
- );
-        
+        // ✅ SECURITY FIX H-1: Get old data FIRST (before any checks)
         PriceData memory oldData = prices[asset];
         
-        // ✅ SECURITY FIX: Check deviation BEFORE updating state
-        // This prevents accepting manipulated prices even if they're "just under" the threshold
+        // ✅ CRITICAL FIX H-1: Check deviation BEFORE rate limiting
+        // This prevents attackers from bypassing rate limits by triggering circuit breaker
+        // If deviation fails and reverts, rate limit timestamp is NOT consumed
         if (oldData.isValid && oldData.price > 0) {
             uint256 deviation = _calculateDeviation(oldData.price, price);
             
@@ -216,6 +212,14 @@ contract OracleAdapter is IOracleAdapter, Ownable {
                 revert("Circuit breaker triggered - price deviation too large");
             }
         }
+        
+        // ✅ SECURITY FIX H-1: Rate limiting AFTER deviation check
+        // Only check rate limit if deviation validation passed
+        // This prevents rate limit bypass when circuit breaker triggers
+        require(
+            block.timestamp >= lastPriceUpdateTime[asset] + MIN_UPDATE_INTERVAL,
+            "Update too frequent - wait 5 minutes between updates"
+        );
         
         // ✅ Only reach here if deviation check passed or no previous price exists
         // Update current price

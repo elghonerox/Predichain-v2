@@ -314,7 +314,8 @@ contract PredictionMarket is
         uint256 resolutionTime
     ) external whenNotPaused nonReentrant returns (uint256 marketId) {
         // Input validation
-
+        
+        // SECURITY FIX L-3: Add maximum length validation
         if (bytes(question).length == 0) revert EmptyQuestion();
         if (bytes(question).length > 500) revert QuestionTooLong();
         if (bytes(asset).length == 0) revert EmptyAssetSymbol();
