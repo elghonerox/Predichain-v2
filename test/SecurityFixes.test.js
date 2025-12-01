@@ -211,4 +211,69 @@ describe("Security Fixes Verification", function () {
             expect(reserved).to.equal(0);
         });
     });
+
+    describe("Audit Improvements (M-2, M-3, L-3)", function () {
+        it("L-3: Should enforce rate limiting on market creation", async function () {
+            const now = await time.latest();
+            const resolutionTime = now + 3600 + 60;
+
+            // First creation should succeed
+            await predictionMarket.connect(user2).createMarket(
+                "Market 1", "BTC", ethers.parseEther("50000"), resolutionTime
+            );
+
+            // Immediate second creation should fail
+            await expect(
+                predictionMarket.connect(user2).createMarket(
+                    "Market 2", "BTC", ethers.parseEther("50000"), resolutionTime
+                )
+            ).to.be.revertedWith("Rate limit: wait 1 minute between creations");
+
+            // Wait 1 minute
+            await time.increase(61);
+
+            // Calculate new resolution time after time increase
+            const newNow = await time.latest();
+            const newResolutionTime = newNow + 3600 + 60;
+
+            // Should succeed now
+            await expect(
+                predictionMarket.connect(user2).createMarket(
+                    "Market 3", "BTC", ethers.parseEther("50000"), newResolutionTime
+                )
+            ).to.not.be.reverted;
+        });
+
+        it("M-3: Should auto-cancel zombie markets", async function () {
+            const now = await time.latest();
+            const resolutionTime = now + 7200; // 2 hours buffer
+
+            await predictionMarket.connect(user1).createMarket(
+                "Zombie Market", "ETH", ethers.parseEther("3000"), resolutionTime
+            );
+            const marketId = await predictionMarket.marketCounter();
+
+            // Advance time past MAX_MARKET_AGE (30 days)
+            const MAX_MARKET_AGE = 30 * 24 * 3600;
+            await time.increase(7200 + MAX_MARKET_AGE + 1);
+
+            // Try to resolve
+            await expect(
+                predictionMarket.resolveMarket(marketId)
+            ).to.emit(predictionMarket, "MarketCancelled")
+                .withArgs(marketId, "Expired without resolution");
+
+            const market = await predictionMarket.markets(marketId);
+            expect(market.status).to.equal(2); // Cancelled
+        });
+
+        it("M-2: Should emit events on emergency pause", async function () {
+            await expect(predictionMarket.connect(owner).pause("Emergency"))
+                .to.emit(predictionMarket, "EmergencyPause")
+                .withArgs(owner.address, "Emergency", await time.latest() + 1);
+
+            await expect(predictionMarket.connect(owner).unpause())
+                .to.emit(predictionMarket, "EmergencyUnpause");
+        });
+    });
 });

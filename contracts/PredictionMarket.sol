@@ -61,6 +61,14 @@ contract PredictionMarket is
     /// SECURITY FIX H-1: Public resolution delay (prevents front-running)
     /// Creator and owner can resolve immediately, others must wait 1 hour
     uint256 public constant PUBLIC_RESOLUTION_DELAY = 1 hours;
+    
+    /// SECURITY FIX M-3: Maximum market age before auto-cancellation
+    /// Prevents zombie markets (30 days after resolution time)
+    uint256 public constant MAX_MARKET_AGE = 30 days;
+    
+    /// SECURITY FIX L-3: Minimum time between market creations
+    /// Prevents spam attacks
+    uint256 public constant MIN_CREATION_INTERVAL = 1 minutes;
 
     // =============================================================
     //                           STORAGE
@@ -165,6 +173,9 @@ contract PredictionMarket is
     /// @notice Creator Address => Number of markets created (for rate limiting)
     mapping(address => uint256) public creatorMarketCount;
 
+    /// SECURITY FIX L-3: Last market creation timestamp per user
+    mapping(address => uint256) public lastMarketCreationTime;
+
     // =============================================================
     //                           EVENTS
     // =============================================================
@@ -240,6 +251,10 @@ contract PredictionMarket is
         uint256 indexed marketId,
         string reason
     );
+
+    /// SECURITY FIX M-2: Emergency pause events
+    event EmergencyPause(address indexed by, string reason, uint256 timestamp);
+    event EmergencyUnpause(address indexed by, uint256 timestamp);
 
     // =============================================================
     //                       INITIALIZATION
@@ -317,6 +332,15 @@ contract PredictionMarket is
         // Rate limiting: Prevent single address from creating too many markets
         if (creatorMarketCount[msg.sender] >= MAX_MARKETS_PER_CREATOR)
             revert TooManyMarkets(msg.sender, MAX_MARKETS_PER_CREATOR);
+
+        // SECURITY FIX L-3: Time-based rate limiting
+        if (lastMarketCreationTime[msg.sender] != 0) {
+            require(
+                block.timestamp >= lastMarketCreationTime[msg.sender] + MIN_CREATION_INTERVAL,
+                "Rate limit: wait 1 minute between creations"
+            );
+        }
+        lastMarketCreationTime[msg.sender] = block.timestamp;
         
         // Increment counters
         unchecked {
@@ -473,6 +497,13 @@ contract PredictionMarket is
         require(market.status == 0, "Market not active"); // 0 = Active
         require(block.timestamp >= market.resolutionTime, "Not ready for resolution");
         
+        // SECURITY FIX M-3: Auto-cancel zombie markets
+        if (block.timestamp > market.resolutionTime + MAX_MARKET_AGE) {
+            market.status = 2; // Cancelled
+            emit MarketCancelled(marketId, "Expired without resolution");
+            return;
+        }
+
         // SECURITY FIX H-1: Access control to prevent front-running
         // Creator or owner can resolve immediately
         // Others must wait PUBLIC_RESOLUTION_DELAY (1 hour) after resolution time
@@ -641,9 +672,11 @@ contract PredictionMarket is
     /**
      * @notice Emergency pause all trading (callable by owner/multisig)
      * @dev Triggers Pausable modifier on all sensitive functions
+     * @param reason Reason for pausing
      */
-    function pause() external onlyOwner {
+    function pause(string calldata reason) external onlyOwner {
         _pause();
+        emit EmergencyPause(msg.sender, reason, block.timestamp);
     }
     
     /**
@@ -651,6 +684,7 @@ contract PredictionMarket is
      */
     function unpause() external onlyOwner {
         _unpause();
+        emit EmergencyUnpause(msg.sender, block.timestamp);
     }
     
     /**
