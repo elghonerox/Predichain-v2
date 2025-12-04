@@ -1,10 +1,5 @@
 # PrediChain - Decentralized Prediction Markets on BNB Chain
 
-[![Tests](https://github.com/elghonerox/predichain/actions/workflows/test.yml/badge.svg)](https://github.com/elghonerox/predichain/actions/workflows/test.yml)
-[![Coverage](https://codecov.io/gh/elghonerox/predichain/branch/main/graph/badge.svg)](https://codecov.io/gh/elghonerox/predichain)
->>>>>>> 04673b6f8d687b675c1d55d158a9678dc174f27d
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
 **PrediChain** is a decentralized prediction market platform built on BNB Chain, enabling users to create and trade on crypto price predictions with production-grade security.
 
 ## 🌟 Key Features
