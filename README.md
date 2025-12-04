@@ -1,8 +1,5 @@
 # PrediChain - Decentralized Prediction Markets on BNB Chain
 
-<<<<<<< HEAD
-[![Tests](https://github.com/yourusername/predichain/actions/workflows/test.yml/badge.svg)](https://github.com/yourusername/predichain/actions/workflows/test.yml)
-=======
 [![Tests](https://github.com/elghonerox/predichain/actions/workflows/test.yml/badge.svg)](https://github.com/elghonerox/predichain/actions/workflows/test.yml)
 [![Coverage](https://codecov.io/gh/elghonerox/predichain/branch/main/graph/badge.svg)](https://codecov.io/gh/elghonerox/predichain)
 >>>>>>> 04673b6f8d687b675c1d55d158a9678dc174f27d
@@ -176,4 +173,4 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 
 - **Demo**: https://predichain.vercel.app
 - **X**: [@PrediChain](https://x.com/predichain)
-- **Discord**: [Join our community](https://discord.gg/predichai
+
