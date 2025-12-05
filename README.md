@@ -1,10 +1,6 @@
 # PrediChain: Reimagining Prediction Markets for Web3 🎯
 
-[![Tests](https://github.com/elghonerox/predichain/actions/workflows/test.yml/badge.svg)](https://github.com/elghonerox/predichain/actions/workflows/test.yml)
-[![Coverage](https://codecov.io/gh/elghonerox/predichain/branch/main/graph/badge.svg)](https://codecov.io/gh/elghonerox/predichain)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-> **A production-ready prediction market protocol that doesn't compromise on speed, security, or user experience.**
+> **A prediction market protocol that doesn't compromise on speed, security, or user experience.**
 
 ---
 
